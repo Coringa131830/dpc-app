@@ -143,6 +143,7 @@ const AvaliatyPatienty = ({ route }) => {
     },
     [user]
   )
+
   useEffect(() =>{
     async function getPrecicao(){
       try {
@@ -157,7 +158,11 @@ const AvaliatyPatienty = ({ route }) => {
   },[])
 
   const handleOpenPdf = () => {
-
+    try {
+        Linking.openURL(user.paciente.prescricao_medica)
+    } catch (error) {
+        console.log(error)
+    }
   }
   return loading ? (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
@@ -180,7 +185,7 @@ const AvaliatyPatienty = ({ route }) => {
               resizeMode: 'contain'
             }}
           />
-          <OptionButton onPress={ ()=> Linking.openURL(pdf)}>
+          <OptionButton onPress={handleOpenPdf}>
                <TextButton>Visualizar Prescrição</TextButton>
           </OptionButton>
           <TextTitle>{user.paciente.nomeCompleto}</TextTitle>
