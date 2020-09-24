@@ -24,6 +24,7 @@
     },
     "android": {
       "package": "com.g3infotech.DeltaPrime"
-    }
+    },
+    "description": ""
   }
 }

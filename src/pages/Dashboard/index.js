@@ -54,7 +54,7 @@ const Dashboard = () => {
     async (scal, type) => {
       setLoading(true)
       try {
-        const geolocation =  `{"lat":"${latitude}", "log":"${longitude}"}`;
+        const geolocation =  `lat:${latitude}, log:${longitude}`;
          
         if (userType === 'paciente') {
           if (scal.checkin.paciente) {
