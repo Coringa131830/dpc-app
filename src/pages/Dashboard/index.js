@@ -37,22 +37,33 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false)
   const { signOut, userType, token } = useAuth()
   const [scales, setScales] = useState([])
-
+  const [latitude, setLatitude] = useState('');
+  const [longitude, setLogitude] = useState('');
   const handleLogout = async () => {
     signOut()
   }
 
-  console.log('aqui', scales)
+  useEffect(() => {
+    navigator.geolocation.getCurrentPosition( position => {
+    
+        setLatitude(String(position.coords.latitude))
+        setLogitude(String(position.coords.longitude))
+    });
+  },[]);
   const handleCheck = useCallback(
     async (scal, type) => {
       setLoading(true)
       try {
+        const geolocation =  `{"lat":"${latitude}", "log":"${longitude}"}`;
+         
         if (userType === 'paciente') {
           if (scal.checkin.paciente) {
             await api.post(
               `/${type}/checkout`,
               {
-                escala: scal._id
+                escala: scal._id,
+                geolocation
+                
               },
               {
                 headers: {
@@ -64,7 +75,8 @@ const Dashboard = () => {
             await api.post(
               `/${type}/checkin`,
               {
-                escala: scal._id
+                escala: scal._id,
+                geolocation
               },
               {
                 headers: {
@@ -78,7 +90,8 @@ const Dashboard = () => {
             await api.post(
               `/${type}/checkout`,
               {
-                escala: scal._id
+                escala: scal._id,
+                geolocation
               },
               {
                 headers: {
@@ -90,7 +103,8 @@ const Dashboard = () => {
             await api.post(
               `/${type}/checkin`,
               {
-                escala: scal._id
+                escala: scal._id,
+                geolocation
               },
               {
                 headers: {
@@ -164,6 +178,7 @@ const Dashboard = () => {
     ) {
       return 'Check-Out'
     } else if (scal.checkin && !scal.checkin.paciente) {
+
       return 'Check-In'
     } else if (
       scal.checkin &&
@@ -208,11 +223,11 @@ const Dashboard = () => {
                         }}
                       />
                     </Col>
-                    <Col style={{ marginLeft: 24 }}>
+                    <Col style={{ marginLeft: 24}}>
                       <TextTitle>
                         {scal.profissionalResponsavel.nomeCompleto}
                       </TextTitle>
-                      <TextOption>
+                      <TextOption >
                         {scal.profissionalResponsavel.cargo}
                       </TextOption>
                       <TextSmall>{scal.horarioDeAtendimento}</TextSmall>
