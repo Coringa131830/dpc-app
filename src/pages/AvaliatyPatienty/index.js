@@ -1,8 +1,10 @@
-import React, { useCallback, useRef, useState, useEffect } from 'react'
+import React, { useCallback, useRef, useState, useEffect } from 'react';
+
 import {
   View,
   ScrollView,
   Alert,
+  Linking,
   TouchableOpacity,
   ActivityIndicator
 } from 'react-native'
@@ -21,6 +23,8 @@ import {
   TextOption,
   TextTitle,
   TextSmall,
+  TextButton,
+  OptionButton,
   TextSmallTwo,
   Card,
   TextOptionTwo,
@@ -40,7 +44,7 @@ const AvaliatyPatienty = ({ route }) => {
   const [signais, setSignais] = useState({})
   const [line, setLine] = useState([])
   const { token } = useAuth()
-
+  const [pdf, setPdf] = useState('');
   useEffect(() => {
     async function getData() {
       setLoading(true)
@@ -139,7 +143,22 @@ const AvaliatyPatienty = ({ route }) => {
     },
     [user]
   )
+  useEffect(() =>{
+    async function getPrecicao(){
+      try {
+        const result = await api.get(`/paciente/prescricao/${user._id}`)
+        setPdf(result.data.prescricao_medica)
+      } catch (error) {
+        console.log(error)
+        
+      }
+    }
+    getPrecicao();
+  },[])
 
+  const handleOpenPdf = () => {
+
+  }
   return loading ? (
     <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
       <ActivityIndicator size="large" color="#6EE7D3" />
@@ -161,6 +180,9 @@ const AvaliatyPatienty = ({ route }) => {
               resizeMode: 'contain'
             }}
           />
+          <OptionButton onPress={ ()=> Linking.openURL(pdf)}>
+               <TextButton>Visualizar Prescrição</TextButton>
+          </OptionButton>
           <TextTitle>{user.paciente.nomeCompleto}</TextTitle>
           <TextOption>{user.paciente.endereco}</TextOption>
           <TextSmall>{user.horarioDeAtendimento}</TextSmall>
