@@ -200,8 +200,13 @@ const Dashboard = () => {
       profissionalId: user._id,
       date
     } 
+    try {
       const response = await api.post('/escala/escalasByDate', body);
       setScales(response.data)
+    } catch (error) {
+      console.log(error)
+      
+    }
   }
 
   if (userType === 'paciente') {
