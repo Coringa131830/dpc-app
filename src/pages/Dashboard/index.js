@@ -3,6 +3,7 @@ import {
   View,
   ScrollView,
   ActivityIndicator,
+  Text,
   TouchableOpacity
 } from 'react-native'
 import { useNavigation } from '@react-navigation/native'
@@ -35,10 +36,11 @@ import img from '../../assets/logo.png'
 const Dashboard = () => {
   const navigation = useNavigation()
   const [loading, setLoading] = useState(false)
-  const { signOut, userType, token } = useAuth()
+  const { signOut, userType, token, user } = useAuth()
   const [scales, setScales] = useState([])
   const [latitude, setLatitude] = useState('');
   const [longitude, setLogitude] = useState('');
+  const [date, setDate] = useState('2020-09-27');
   const handleLogout = async () => {
     signOut()
   }
@@ -193,6 +195,14 @@ const Dashboard = () => {
   useEffect(() => {
     getData()
   }, [token])
+  const handleSearchProcess = async () => {
+    const body = {
+      profissionalId: user._id,
+      date
+    } 
+      const response = await api.post('/escala/escalasByDate', body);
+      setScales(response.data)
+  }
 
   if (userType === 'paciente') {
     return loading ? (
@@ -207,7 +217,24 @@ const Dashboard = () => {
             contentContainerStyle={{ flex: 1 }}
             keyboardShouldPersistTaps="handled"
           >
-            <Calendar current={new Date()} monthFormat={'MM/yyyy'} />
+            <Calendar 
+              markingType={'custom'}
+              markedDates={{
+                [date]: {
+                  customStyles: {
+                    container: {
+                      backgroundColor: '#61d53a'
+                    },
+                    text: {
+                      color: 'black',
+                      fontWeight: 'bold'
+                    }
+                  }
+                }}}
+              onDayPress={(day) => setDate(day.dateString)}
+
+            />
+
             {scales && scales.length ? (
               scales.map((scal) => (
                 <CardTwo key={scal._id}>
@@ -289,7 +316,26 @@ const Dashboard = () => {
             contentContainerStyle={{ flex: 1 }}
             keyboardShouldPersistTaps="handled"
           >
-            <Calendar current={new Date()} monthFormat={'MM/yyyy'} />
+            <Text>{date}</Text>
+            <Calendar
+                markingType={'custom'}
+                markedDates={{
+                  [date]: {
+                    customStyles: {
+                      container: {
+                        backgroundColor: '#61d53a'
+                      },
+                      text: {
+                        color: 'black',
+                        fontWeight: 'bold'
+                      }
+                    }
+                  }}}
+                onDayPress={(day) => setDate(day.dateString)}
+              />
+            <OptionButton onPress={handleSearchProcess}>
+              <TextButton>Buscar</TextButton>
+            </OptionButton>
             {scales && scales.length ? (
               scales.map((scal) => (
                 <CardTwo key={scal._id}>
@@ -352,6 +398,7 @@ const Dashboard = () => {
             ) : (
               <View></View>
             )}
+         
             <OptionButton onPress={handleLogout}>
               <TextButton>Sair</TextButton>
             </OptionButton>
